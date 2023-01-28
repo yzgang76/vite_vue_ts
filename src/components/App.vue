@@ -27,10 +27,6 @@ const btn3 = () =>{
     a.value ++
     b.value --
 }
-
-let ob3= {
-    c:100
-}
 </script>
 
 <template>
