@@ -122,7 +122,7 @@ let rawHtml="<p>测试数据</p>"
 
 ![img.png](assets/v-html.png)
 
-- 响应式数据
+### 响应式数据
   响应式数据必须使用 ref(简单数据)和reactive(对象，数组). Vue3的响应机制是基于Proxy和Reflect的而Vue2是基于Object.defineProperty。
 
 ```
@@ -174,4 +174,44 @@ reactive() API 有两条限制：
 
 - 仅对对象类型有效（对象、数组和 Map、Set 这样的集合类型），而对 string、number 和 boolean 这样的 原始类型 无效。
 
-- 因为 Vue 的响应式系统是通过属性访问进行追踪的，因此我们必须始终保持对该响应式对象的相同引用。这意味着我们不可以随意地“替换”一个响应式对象，因为这将导致对初始引用的响应性连接丢失：
+- 因为 Vue 的响应式系统是通过属性访问进行追踪的，因此我们必须始终保持对该响应式对象的相同引用。这意味着我们不可以随意地“替换”一个响应式对象，因为这将导致对初始引用的响应性连接丢失
+
+### 计算属性 
+类似定义get
+
+```
+<script setup lang="ts">
+import {computed, reactive, ref, toRef, toRefs} from 'vue'
+
+const data = ref(0);
+const computedData = computed(() => {
+    console.error('1111111111111111111')
+    return data.value
+})
+let getData = () => {
+    console.error('222222222222222222')
+    return data.value
+}
+
+const btn = () => {
+    data.value++
+}
+const data2 = ref(0)
+const btn2 = () => {  //invoke btn2 will trigger getData() but use cached computedData
+    data2.value++
+}
+
+</script>
+
+<template>
+    <h1>APP组件数据：</h1>
+    <div>响应式数据：{{ computedData }}, {{ getData() }}
+        <button @click="btn">修改</button>
+    </div>
+    <div>响应式数据2：{{ data2 }}
+        <button @click="btn2">修改</button>
+    </div>
+</template>
+
+<style scoped></style>
+```
