@@ -215,3 +215,37 @@ const btn2 = () => {  //invoke btn2 will trigger getData() but use cached comput
 
 <style scoped></style>
 ```
+
+### 动态Class和Style
+- 我们可以给 :class (v-bind:class 的缩写) 传递一个对象来动态切换 class
+- :style 支持绑定 JavaScript 对象值，对应的是 HTML 元素的 style 属性
+
+https://cn.vuejs.org/guide/essentials/class-and-style.html#binding-html-classes
+
+### 条件渲染
+
+```
+<script setup lang="ts">
+import {ref} from 'vue'
+
+let awesome = ref(true)
+
+</script>
+
+<template>
+    <h1>APP组件数据：</h1>
+
+    <button @click="awesome = !awesome">Toggle</button>
+    <h1 v-if="awesome">Vue is awesome!</h1>
+    <h1 v-else>Oh no 😢</h1>
+
+    <h1 v-show="awesome">v-show</h1>
+</template>
+
+<style scoped></style>
+```
+还有 v-else-if
+
+## **同时使用 v-if 和 v-for 是不推荐的，因为这样二者的优先级不明显。请查看风格指南获得更多信息。**
+
+in Vue3 v-if > v-for, in Vue2 v-for > v-if
