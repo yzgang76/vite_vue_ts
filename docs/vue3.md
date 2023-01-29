@@ -309,3 +309,86 @@ const selected = ref()
 ```
 - 通过 key 管理状态
   https://blog.csdn.net/weixin_58032613/article/details/122862407
+
+### 事件处理 v-on
+
+用法：v-on:click="methodName" 或 @click="handler
+
+有时我们需要在内联事件处理器中访问原生 DOM 事件。你可以向该处理器方法传入一个特殊的 $event 变量，或者使用内联箭头函数：
+
+```
+<!-- 使用特殊的 $event 变量 -->
+<button @click="warn('Form cannot be submitted yet.', $event)">
+  Submit
+</button>
+
+<!-- 使用内联箭头函数 -->
+<button @click="(event) => warn('Form cannot be submitted yet.', event)">
+  Submit
+</button>
+
+```
+
+- 事件修饰符
+
+在处理事件时调用 event.preventDefault() 或 event.stopPropagation() 是很常见的。尽管我们可以直接在方法内调用，但如果方法能更专注于数据逻辑而不用去处理 DOM 事件的细节会更好。
+
+为解决这一问题，Vue 为 v-on 提供了事件修饰符。修饰符是用 . 表示的指令后缀，包含以下这些：
+
+    stop
+    prevent
+    self
+    capture
+    once
+    passive
+
+```
+<!-- 单击事件将停止传递 -->
+<a @click.stop="doThis"></a>
+
+<!-- 提交事件将不再重新加载页面 -->
+<form @submit.prevent="onSubmit"></form>
+
+<!-- 修饰语可以使用链式书写 -->
+<a @click.stop.prevent="doThat"></a>
+
+<!-- 也可以只有修饰符 -->
+<form @submit.prevent></form>
+
+<!-- 仅当 event.target 是元素本身时才会触发事件处理器 -->
+<!-- 例如：事件处理器不来自子元素 -->
+<div @click.self="doThat">...</div>
+```
+
+使用修饰符时需要注意调用顺序，因为相关代码是以相同的顺序生成的。
+因此使用 @click.prevent.self 会阻止元素及其子元素的所有点击事件的默认行为
+而 @click.self.prevent 则只会阻止对元素本身的点击事件的默认行为。
+
+- 按键修饰符
+```
+<!-- 仅在 `key` 为 `Enter` 时调用 `submit` -->
+<input @keyup.enter="submit" />
+
+<!-- Alt + Enter -->
+<input @keyup.alt.enter="clear" />
+
+<!-- Ctrl + 点击 -->
+<div @click.ctrl="doSomething">Do something</div>
+
+```
+
+- 鼠标按键修饰符:
+
+      left
+      right
+      middle
+
+https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
+
+
+### 表单输入绑定
+
+https://cn.vuejs.org/guide/essentials/forms.html
+
+
+### 生命周期钩子
