@@ -695,3 +695,85 @@ const handleMsg = (m: string) => {
 <style scoped></style>
 
 ```
+
+- mitt
+子组件祸任意组件间通讯有多种方法，这里介绍基于mitt的事件bus
+
+首先安装mitt ```npm i mitt -S```
+创建一个工具包， src下新建utils目录， 然后新建一个eventBus.ts文件
+
+```
+import mitt, {Emitter} from 'mitt'
+
+export type Event = {
+    topic: string,
+    data?: any
+}
+export const Bus:Emitter<Event> = mitt<Event>();
+```
+
+实现从Child1发送数据到Child2
+
+Child1.vue
+
+```
+<template>
+    <h1>Child1</h1>
+    <button @click="emitEvent">发送消息</button>
+</template>
+
+<script setup lang="ts">
+import {Bus} from '../utils/eventBus'
+
+let num  =0;
+const emitEvent = () => {
+    Bus.emit('evToChild2', {topic: 'test', data: num++})
+}
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+Child2.vue
+```
+<template>
+    <h1>Child2</h1>
+    <div>来自Child1的消息：{{event.topic}}:{{event.data}}</div>
+</template>
+
+<script setup lang="ts">
+import {reactive, ref} from "vue";
+import {Event, Bus} from '../utils/eventBus'
+let event = reactive<Event>({topic: 'NA'})
+Bus.on('evToChild2', (e: Event) => {
+    event.topic = e.topic
+    event.data = e.data
+})
+</script>
+
+<style scoped>
+
+</style>
+```
+
+App.vue
+
+```
+<script setup lang="ts">
+import Child1 from "./Child1.vue"
+import Child2 from "./Child2.vue"
+
+</script>
+
+<template>
+    <Child1></Child1>
+    <Child2></Child2>
+</template>
+
+<style scoped></style>
+
+```
+

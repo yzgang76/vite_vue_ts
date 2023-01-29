@@ -1,17 +1,16 @@
 <template>
     <h1>Child2</h1>
-    <input type="number" :value="numOfChild" @input="update">
+    <div>来自Child1的消息：{{event.topic}}:{{event.data}}</div>
 </template>
 
 <script setup lang="ts">
-defineProps({numOfChild: {type: Number, default: 0}})
-const emits = defineEmits<{
-    (e: 'update:num-of-child', num: number): void
-}>()
-
-const update = (ev: any) => {
-    emits('update:num-of-child', parseInt(ev.target.value))  //key is 'update:num'
-}
+import {reactive, ref} from "vue";
+import {Event, Bus} from '../utils/eventBus'
+let event = reactive<Event>({topic: 'NA'})
+Bus.on('evToChild2', (e: Event) => {
+    event.topic = e.topic
+    event.data = e.data
+})
 </script>
 
 <style scoped>

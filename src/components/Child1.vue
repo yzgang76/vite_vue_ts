@@ -1,24 +1,14 @@
 <template>
-<h1>Child1</h1>
-    <div>子组件属性msg: {{msg}}</div>
-    <button @click="submit">hello</button>
+    <h1>Child1</h1>
+    <button @click="emitEvent">发送消息</button>
 </template>
 
 <script setup lang="ts">
-const {msg} =defineProps({
-    msg: {
-        type: String,
-        default: "111",
-        required: true
-    }
-});
+import {Bus} from '../utils/eventBus'
 
-const emits = defineEmits<{
-    (e: 'sayHello', msg: string): void
-}>()
-
-const submit=()=>{
-    emits('sayHello',msg.split('').reverse().join(''))
+let num  =0;
+const emitEvent = () => {
+    Bus.emit('evToChild2', {topic: 'test', data: num++})
 }
 
 </script>
