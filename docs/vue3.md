@@ -3,7 +3,7 @@
 ## 开发环境
 
 1. Webstorm 安装插件
-   ![img.png](assets/plugins.png)
+![img.png](assets/plugins.png)
 
 
 2. 创建Vite Vue项目
@@ -945,7 +945,7 @@ import LoggerService from "../services/LoggerService";
 
 const loggerService: LoggerService | undefined = inject('LoggerService');
 const moduleName = 'App';
-
+[Vue Simulator.md](..%2F..%2F..%2FUsers%2Fyzgan%2FDesktop%2FVue%20Simulator.md)
 function log(msg: string) {
     loggerService?.log(moduleName, msg);
 }
@@ -964,4 +964,127 @@ onMounted(()=>{
 ```
 
 https://cn.vuejs.org/guide/components/provide-inject.html#working-with-reactivity
+
+### Server API
+大多数情况下前台开发和后台（包括nodejs) API是两个独立项目
+
+通过ApiFox定义一个新的API并自动生成模拟服务和数据
+
+![img.png](assets/simulateAPI.png)
+
+在vite.conf.ts中配置proxy
+
+```
+server:{
+    port:3000,
+    proxy: {
+      '/api':'http://127.0.0.1:4523/m1/2213202-0-default'
+    }
+  }
+```
+
+安装axios库来同意使用API服务  ```npm i axios -S``
+增加utils/request.ts来封装。
+```
+import axios from 'axios';
+
+const service  = axios.create();
+
+service.interceptors.request.use(
+    config => {
+        return config;
+    },
+    error => {
+        return Promise.reject(error)
+    }
+);
+
+service.interceptors.response.use(
+    response => {
+        return response;
+    },
+    error => {
+        return Promise.reject(error)
+    }
+);
+
+export default service;
+
+```
+为了解耦封装API。 
+
+新建src/apis目录， 在其中定义API来使用前面模拟API服务
+
+userInfo.ts
+
+```
+import request from '../utils/request'
+import {catchError, from, Observable, of} from "rxjs";
+import {map} from "rxjs/operators";
+import {AxiosResponse} from "axios";
+
+export interface UserInfo {
+    name: string,
+    age: number,
+    sex: string
+}
+
+export function getUserInfo(): Observable<UserInfo[] | undefined> {
+    return from(request({
+        url: '/api/getUserInfo'
+    })).pipe(
+        map((res: AxiosResponse<any, any>) => {
+            return res.data;
+        }),
+        catchError(error => {
+            console.error('getUserInfo failed', error);
+            return of(undefined);
+        })
+    );
+}
+
+```
+这里使用了Rxjs， 所以要安装 ```npm i rxjs -S```
+
+在App.vue中使用api来获取数据
+
+```
+<script setup lang="ts">
+import {getUserInfo, UserInfo} from '../apis/userInfo';
+import {onBeforeMount, ref} from "vue";
+import {map} from "rxjs/operators";
+
+const users = ref<UserInfo[]>([]);
+onBeforeMount(() => {
+    getUserInfo().pipe(
+        map((users:UserInfo[]) => {  //add static unique id for v-for
+            users.forEach((u,i)=>u.id=i)
+            return users;
+        })).subscribe((res: UserInfo[]) => {
+        if (res) {
+            users.value = res;
+        }
+    })
+})
+</script>
+
+<template>
+    <h1>App 数据</h1>
+    <ul>
+        <li v-for='user in users' :key='user.id'>
+            {{ user.name }}({{ user.sex }}):{{ user.age }}
+        </li>
+    </ul>
+</template>
+
+<style scoped></style>
+
+```
+
+### 异步组件
+
+- 延迟加载，优化性能
+- 打包分包，优化初始化[Vue Simulator.md](..%2F..%2F..%2FUsers%2Fyzgan%2FDesktop%2FVue%20Simulator.md)装载速度
+
+
 
