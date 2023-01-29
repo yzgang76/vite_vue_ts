@@ -1082,9 +1082,53 @@ onBeforeMount(() => {
 ```
 
 ### 异步组件
-
+在大型项目中，我们可能需要拆分应用为更小的块，并仅在需要时再从服务器加载相关组件。Vue 提供了 defineAsyncComponent 方法来实现此功能
 - 延迟加载，优化性能
 - 打包分包，优化初始化[Vue Simulator.md](..%2F..%2F..%2FUsers%2Fyzgan%2FDesktop%2FVue%20Simulator.md)装载速度
 
+重写Child1.vue
+
+```
+<template>
+    <h1>Child1</h1>
+</template>
+
+<script setup lang="ts">
+import {onBeforeMount} from "vue";
+import {getUserInfo} from '../apis/userInfo'
+onBeforeMount(()=>{
+    getUserInfo()
+})
+</script>
+
+```
+在APP.vue中引入Child1并定义为异步组件
+```
+<script setup lang="ts">
+import {defineAsyncComponent} from "vue";
+
+const Child1 = defineAsyncComponent(()=> import ("./Child1.vue"))
+
+</script>
+
+<template>
+    <h1>App 数据</h1>
+    <suspense>
+        <template #default>  //#default, #fallback是系统常量
+            <Child1></Child1>
+        </template>
+        <template #fallback>  
+            loading... //未完成装在前显示
+        </template>
+    </suspense>
+</template>
+
+<style scoped></style>
+```
+
+测试时可以设置浏览器模拟3G网络速度。
 
 
+```<Suspense>``` 是一个内置组件，用来在组件树中协调对异步依赖的处理。它让我们可以在组件树上层等待下层的多个嵌套异步依赖项解析完成，并可以在等待时渲染一个加载状态。
+
+https://cn.vuejs.org/guide/components/async.html#loading-and-error-states

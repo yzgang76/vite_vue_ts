@@ -1,29 +1,20 @@
 <script setup lang="ts">
-import {getUserInfo, UserInfo} from '../apis/userInfo';
-import {onBeforeMount, ref} from "vue";
-import {map} from "rxjs/operators";
+import {defineAsyncComponent} from "vue";
 
-const users = ref<UserInfo[]>([]);
-onBeforeMount(() => {
-    getUserInfo().pipe(
-        map((users:UserInfo[]) => {  //add static unique id for v-for
-            users.forEach((u,i)=>u.id=i)
-            return users;
-        })).subscribe((res: UserInfo[]) => {
-        if (res) {
-            users.value = res;
-        }
-    })
-})
+const Child1 = defineAsyncComponent(()=> import ("./Child1.vue"))
+
 </script>
 
 <template>
     <h1>App 数据</h1>
-    <ul>
-        <li v-for='user in users' :key='user.id'>
-            {{ user.name }}({{ user.sex }}):{{ user.age }}
-        </li>
-    </ul>
+    <suspense>
+        <template #default>
+            <Child1></Child1>
+        </template>
+        <template #fallback>
+            loading...
+        </template>
+    </suspense>
 </template>
 
 <style scoped></style>
