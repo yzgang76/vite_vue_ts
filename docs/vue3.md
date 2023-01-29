@@ -905,3 +905,63 @@ let dynamicSlot = 'div3'
 <style scoped></style>
 
 ```
+
+### 依赖注入
+
+以创建logger service为例
+
+新建src/services目录
+
+创建LoggerService.ts
+
+```
+export default class LoggerService {
+    log(module:string, msg: string):void{
+        console.error(`[${module}]: ${msg}`);
+    }
+}
+```
+
+在main.ts中定义全局provide
+
+```
+import {createApp} from 'vue'
+import App from './components/App/App.vue'
+import LoggerService from "./services/LoggerService";
+import './style.css'
+
+const app = createApp(App)
+app.provide(/*注入名*/'LoggerService',/*值*/ new LoggerService());
+app.mount('#app');
+
+```
+
+在App.vue中注入并使用LoggerService
+
+```
+<script setup lang="ts">
+import {inject, onMounted} from "vue";
+import LoggerService from "../services/LoggerService";
+
+const loggerService: LoggerService | undefined = inject('LoggerService');
+const moduleName = 'App';
+
+function log(msg: string) {
+    loggerService?.log(moduleName, msg);
+}
+
+onMounted(()=>{
+    log('mounted');
+})
+</script>
+
+<template>
+
+</template>
+
+<style scoped></style>
+
+```
+
+https://cn.vuejs.org/guide/components/provide-inject.html#working-with-reactivity
+
