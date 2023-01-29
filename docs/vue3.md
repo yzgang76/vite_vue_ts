@@ -123,7 +123,8 @@ let rawHtml="<p>测试数据</p>"
 ![img.png](assets/v-html.png)
 
 ### 响应式数据
-  响应式数据必须使用 ref(简单数据)和reactive(对象，数组). Vue3的响应机制是基于Proxy和Reflect的而Vue2是基于Object.defineProperty。
+
+响应式数据必须使用 ref(简单数据)和reactive(对象，数组). Vue3的响应机制是基于Proxy和Reflect的而Vue2是基于Object.defineProperty。
 
 ```
 <script setup lang="ts">
@@ -168,6 +169,7 @@ const btn3 = () =>{
 
 <style scoped></style>
 ```
+
 只有代理对象是响应式的，更改原始对象不会触发更新。因此，使用 Vue 的响应式系统的最佳实践是 仅使用你声明对象的代理版本。
 
 reactive() API 有两条限制：
@@ -176,7 +178,8 @@ reactive() API 有两条限制：
 
 - 因为 Vue 的响应式系统是通过属性访问进行追踪的，因此我们必须始终保持对该响应式对象的相同引用。这意味着我们不可以随意地“替换”一个响应式对象，因为这将导致对初始引用的响应性连接丢失
 
-### 计算属性 
+### 计算属性
+
 类似定义get
 
 ```
@@ -217,6 +220,7 @@ const btn2 = () => {  //invoke btn2 will trigger getData() but use cached comput
 ```
 
 ### 动态Class和Style
+
 - 我们可以给 :class (v-bind:class 的缩写) 传递一个对象来动态切换 class
 - :style 支持绑定 JavaScript 对象值，对应的是 HTML 元素的 style 属性
 
@@ -244,14 +248,15 @@ let awesome = ref(true)
 
 <style scoped></style>
 ```
+
 还有 v-else-if
 
 ## **同时使用 v-if 和 v-for 是不推荐的，因为这样二者的优先级不明显。请查看风格指南获得更多信息。**
 
 in Vue3 v-if > v-for, in Vue2 v-for > v-if
 
-
 ### v-for
+
 ```
 <script setup lang="ts">
 import {ref, reactive} from 'vue'
@@ -307,6 +312,7 @@ const selected = ref()
 
 <style scoped></style>
 ```
+
 - 通过 key 管理状态
   https://blog.csdn.net/weixin_58032613/article/details/122862407
 
@@ -331,7 +337,8 @@ const selected = ref()
 
 - 事件修饰符
 
-在处理事件时调用 event.preventDefault() 或 event.stopPropagation() 是很常见的。尽管我们可以直接在方法内调用，但如果方法能更专注于数据逻辑而不用去处理 DOM 事件的细节会更好。
+在处理事件时调用 event.preventDefault() 或 event.stopPropagation() 是很常见的。尽管我们可以直接在方法内调用，但如果方法能更专注于数据逻辑而不用去处理
+DOM 事件的细节会更好。
 
 为解决这一问题，Vue 为 v-on 提供了事件修饰符。修饰符是用 . 表示的指令后缀，包含以下这些：
 
@@ -365,6 +372,7 @@ const selected = ref()
 而 @click.self.prevent 则只会阻止对元素本身的点击事件的默认行为。
 
 - 按键修饰符
+
 ```
 <!-- 仅在 `key` 为 `Enter` 时调用 `submit` -->
 <input @keyup.enter="submit" />
@@ -385,17 +393,15 @@ const selected = ref()
 
 https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 
-
 ### 表单输入绑定
 
 https://cn.vuejs.org/guide/essentials/forms.html
-
 
 ### 生命周期钩子以及动态组件
 
 新建两个组件Child1 和Child2
 
-Child1.vue: 打印生命周期事件  
+Child1.vue: 打印生命周期事件
 
 ```
 <template>
@@ -423,8 +429,8 @@ onUnmounted(()=>{
 
 </style>
 ```
-Child2.vue类似， 只有打印信息不同
 
+Child2.vue类似， 只有打印信息不同
 
 App.vue: 动态组件
 
@@ -484,6 +490,7 @@ watch( ()=>msg.value,
 
 </style>
 ```
+
 watch 的第一个参数可以是不同形式的“数据源”：它可以是一个 ref (包括计算属性)、一个响应式对象、一个 getter 函数、或多个数据源组成的数组
 
 定义getter, setter
@@ -499,21 +506,22 @@ watch(
 
 ```
 
- - watchEffect()
-   watch 和 watchEffect 都能响应式地执行有副作用的回调。它们之间的主要区别是追踪响应式依赖的方式：
+- watchEffect()
+  watch 和 watchEffect 都能响应式地执行有副作用的回调。它们之间的主要区别是追踪响应式依赖的方式：
 
-watch 只追踪明确侦听的数据源。它不会追踪任何在回调中访问到的东西。另外，仅在数据源确实改变时才会触发回调。watch 会避免在发生副作用时追踪依赖，因此，我们能更加精确地控制回调函数的触发时机。
+watch 只追踪明确侦听的数据源。它不会追踪任何在回调中访问到的东西。另外，仅在数据源确实改变时才会触发回调。watch
+会避免在发生副作用时追踪依赖，因此，我们能更加精确地控制回调函数的触发时机。
 
 watchEffect，则会在副作用发生期间追踪依赖。它会在同步执行过程中，自动追踪所有能访问到的响应式属性。这更方便，而且代码往往更简洁，但有时其响应性依赖关系会不那么明确。
 
- - unwatch
+- unwatch
 
 https://cn.vuejs.org/guide/essentials/watchers.html#stopping-a-watcher
 
-
 ### 模板引用
 
-虽然 Vue 的声明性渲染模型为你抽象了大部分对 DOM 的直接操作，但在某些情况下，我们仍然需要直接访问底层 DOM 元素。要实现这一点，我们可以使用特殊的 ref attribute
+虽然 Vue 的声明性渲染模型为你抽象了大部分对 DOM 的直接操作，但在某些情况下，我们仍然需要直接访问底层 DOM
+元素。要实现这一点，我们可以使用特殊的 ref attribute
 
 ```
 <script setup lang="ts">
@@ -538,3 +546,152 @@ onMounted(() => {
 
 https://cn.vuejs.org/guide/essentials/template-refs.html#ref-on-component
 
+### 组件间通讯
+
+- 父到子
+    - Props
+    - v-model
+- 子到父
+    - emit
+- 子到子
+    - mitt
+
+在子组件中定义需要传入的Props
+
+```
+const {msg} =defineProps({
+    msg: {
+        type: String,
+        default: "111",
+        required: true
+    }
+});
+```
+
+父组件在模版中传入属性值
+
+```
+<Child1 :msg="msgParent"></Child1>  //传入变量
+<Child1 msg="abc"></Child1>  //传入常量
+```
+
+在子组件中定义发往父组件到事件
+
+```
+const emits = defineEmits<{
+    (e: 'sayHello', msg: string): void   //事件id 是 'sayHello‘， 事件数据是一个string
+}>()
+
+const submit=()=>{
+    emits('sayHello',msg.split('').reverse().join(''))  //触发sayHello事件
+}
+
+<button @click="submit">hello</button>  //页面触发按钮
+```
+
+在父组件中定义接受事件
+
+```
+<Child1 @sayHello="handleMsg"></Child1> //注意事件ID
+
+const handleMsg = (m: string) => { //处理收到到事件数据
+    msgFromChild.value = m
+}
+
+```
+
+- 使用v-model实现父子数据同步更新
+在子组件中定义prop, event
+```
+defineProps({numOfChild: {type: Number, default: 0}})
+const emits = defineEmits<{
+    (e: 'update:num-of-child', num: number): void //event id must follow'update:<属性命>'。 注意这里的大小写规则！
+}>()
+```
+
+在父组件中使用v-model
+
+```
+<Child2 v-model:num-of-child="numOfParent"></Child2>
+```
+以下是完整代码
+
+Child1.vue
+```
+<template>
+<h1>Child1</h1>
+    <div>子组件属性msg: {{msg}}</div>
+    <button @click="submit">hello</button>
+</template>
+
+<script setup lang="ts">
+const {msg} =defineProps({
+    msg: {
+        type: String,
+        default: "111",
+        required: true
+    }
+});
+
+const emits = defineEmits<{
+    (e: 'sayHello', msg: string): void
+}>()
+
+const submit=()=>{
+    emits('sayHello',msg.split('').reverse().join(''))
+}
+
+</script>
+
+<style scoped>
+
+</style>
+```
+Child2.vue
+```
+<template>
+    <h1>Child2</h1>
+    <input type="number" :value="numOfChild" @input="update">
+</template>
+
+<script setup lang="ts">
+defineProps({numOfChild: {type: Number, default: 0}})
+const emits = defineEmits<{
+    (e: 'update:num-of-child', num: number): void
+}>()
+
+const update = (ev: any) => {
+    emits('update:num-of-child', parseInt(ev.target.value))  //key is 'update:num'
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+App.vue
+```
+<script setup lang="ts">
+import {ref} from 'vue'
+import Child1 from "./Child1.vue"
+import Child2 from "./Child2.vue"
+
+const msgParent = ref('From Parent')
+const msgFromChild = ref("default")
+const numOfParent =ref(2);
+const handleMsg = (m: string) => {
+    msgFromChild.value = m
+}
+</script>
+
+<template>
+    <div>父组件数据str:{{msgFromChild}}</div>
+    <Child1 :msg="msgParent" @sayHello="handleMsg"></Child1>
+    <hr>
+    <div>父组件数据num:{{numOfParent}}</div>
+    <Child2 v-model:num-of-child="numOfParent"></Child2>
+</template>
+
+<style scoped></style>
+
+```

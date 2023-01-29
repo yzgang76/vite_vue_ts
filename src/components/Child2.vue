@@ -1,22 +1,17 @@
 <template>
-<h1>Child2</h1>
+    <h1>Child2</h1>
+    <input type="number" :value="numOfChild" @input="update">
 </template>
 
 <script setup lang="ts">
-import {onBeforeMount, onBeforeUnmount, onMounted, onUnmounted} from "vue";
+defineProps({numOfChild: {type: Number, default: 0}})
+const emits = defineEmits<{
+    (e: 'update:num-of-child', num: number): void
+}>()
 
-onBeforeMount(()=>{
-    console.error('c2:onBeforeMount')
-})
-onMounted(()=>{
-    console.error('c2:onMounted')
-})
-onBeforeUnmount(()=>{
-    console.error('c2:onBeforeUnmount')
-})
-onUnmounted(()=>{
-    console.error('c2:onUnmounted')
-})
+const update = (ev: any) => {
+    emits('update:num-of-child', parseInt(ev.target.value))  //key is 'update:num'
+}
 </script>
 
 <style scoped>
