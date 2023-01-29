@@ -509,3 +509,32 @@ watchEffect，则会在副作用发生期间追踪依赖。它会在同步执行
  - unwatch
 
 https://cn.vuejs.org/guide/essentials/watchers.html#stopping-a-watcher
+
+
+### 模板引用
+
+虽然 Vue 的声明性渲染模型为你抽象了大部分对 DOM 的直接操作，但在某些情况下，我们仍然需要直接访问底层 DOM 元素。要实现这一点，我们可以使用特殊的 ref attribute
+
+```
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+// 声明一个 ref 来存放该元素的引用
+// 必须和模板里的 ref 同名
+const input = ref(null)
+
+onMounted(() => {
+    input.value.focus()
+})
+</script>
+
+<template>
+    <input ref="input" />
+</template>
+
+<style scoped></style>
+
+```
+
+https://cn.vuejs.org/guide/essentials/template-refs.html#ref-on-component
+

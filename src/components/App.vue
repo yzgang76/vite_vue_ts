@@ -1,19 +1,17 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 
-import {ref, watch} from 'vue'
+// 声明一个 ref 来存放该元素的引用
+// 必须和模板里的 ref 同名
+const input = ref(null)
 
-let msg = ref("abc");
-
-watch(() => msg.value,
-    (newValue, oldValue) => {
-        console.error(`msg: ${newValue} from ${oldValue}`);
-    },
-    {immediate: true}
-)
+onMounted(() => {
+    input.value.focus()
+})
 </script>
 
 <template>
-    <input type="text" name="input" v-model="msg">
+    <input ref="input" />
 </template>
 
 <style scoped></style>
