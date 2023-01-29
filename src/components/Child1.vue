@@ -1,16 +1,17 @@
 <template>
     <h1>Child1</h1>
-    <button @click="emitEvent">发送消息</button>
+    <div>Div1:
+        <slot name="div1"></slot>
+    </div>
+    <div>Div2:
+        <slot name="div2"></slot>
+    </div>
+    <div>Div3:
+        <slot name="div3"></slot>
+    </div>
 </template>
 
 <script setup lang="ts">
-import {Bus} from '../utils/eventBus'
-
-let num  =0;
-const emitEvent = () => {
-    Bus.emit('evToChild2', {topic: 'test', data: num++})
-}
-
 </script>
 
 <style scoped>

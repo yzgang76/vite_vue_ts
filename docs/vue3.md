@@ -777,3 +777,131 @@ import Child2 from "./Child2.vue"
 
 ```
 
+
+### slot
+
+我们可能想要为子组件传递一些模板片段，让子组件在它们的组件中渲染这些片段。
+```
+//父
+<FancyButton>
+  Click me! <!-- 插槽内容 -->
+</FancyButton>
+
+//子
+<button class="fancy-btn">
+  <slot></slot> <!-- 匿名插槽出口 -->
+</button>
+```
+
+一般使用具名slot
+
+```
+//子
+    <div>Div1:
+        <slot name="div1"></slot>
+    </div>
+    <div>Div2:
+        <slot name="div2"></slot>
+    </div>
+    <div>Div3:
+        <slot name="div3"></slot>
+    </div>
+    
+//父
+   <template v-slot:div1> Slot {{ data1 }}</template>
+   <template #div2> Slot {{ data2 }}</template>  //v-slot简写
+   <template #[dynamicSlot]> Slot {{ data3 }}</template>   //动态slot
+```
+
+插槽内容无法访问子组件的数据
+
+ - 作用域插槽: 在某些场景下插槽的内容可能想要同时使用父组件域内和子组件域内的数据。要做到这一点，我们需要一种方法来让子组件在渲染时将一部分数据提供给插槽
+
+```
+//子
+    <div v-for="item in items" :key="item.id">
+        <slot :data="item"></slot>
+    </div>
+//父
+    <template #default="{data}"> {{ data.age }}</template>
+```
+
+https://cn.vuejs.org/guide/components/slots.html#scoped-slots
+
+完整代码
+
+Child1.vue
+```
+<template>
+    <h1>Child1</h1>
+    <div>Div1:
+        <slot name="div1"></slot>
+    </div>
+    <div>Div2:
+        <slot name="div2"></slot>
+    </div>
+    <div>Div3:
+        <slot name="div3"></slot>
+    </div>
+</template>
+
+<script setup lang="ts">
+</script>
+
+<style scoped>
+
+</style>
+```
+
+Childe2.vue
+```
+<template>
+    <h1>Child2</h1>
+    <div v-for="item in items" :key="item.id">
+        <slot :data="item"></slot>
+    </div>
+</template>
+
+<script setup lang="ts">
+const items=[
+    {id:1,name:'a',age:3},
+    {id:2,name:'b',age:32},
+    {id:3,name:'c',age:33},
+    {id:4,name:'d',age:13},
+]
+</script>
+
+<style scoped>
+
+</style>
+```
+
+App.vue
+```
+<script setup lang="ts">
+import Child1 from "./Child1.vue"
+import Child2 from "./Child2.vue"
+import {ref} from "vue";
+
+const data1 = ref("a")
+const data2 = ref("b")
+const data3 = ref("c")
+
+let dynamicSlot = 'div3'
+
+</script>
+
+<template>
+    <Child1>
+        <template v-slot:div1> Slot {{ data1 }}</template>
+        <template #div2> Slot {{ data2 }}</template>
+        <template #[dynamicSlot]> Slot {{ data3 }}</template>
+    </Child1>
+    <Child2>
+        <template #default="{data}"> {{ data.age }}</template>
+    </Child2>
+</template>
+
+<style scoped></style>
+
+```

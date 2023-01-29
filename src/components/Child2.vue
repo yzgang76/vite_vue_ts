@@ -1,16 +1,17 @@
 <template>
     <h1>Child2</h1>
-    <div>来自Child1的消息：{{event.topic}}:{{event.data}}</div>
+    <div v-for="item in items" :key="item.id">
+        <slot :data="item"></slot>
+    </div>
 </template>
 
 <script setup lang="ts">
-import {reactive, ref} from "vue";
-import {Event, Bus} from '../utils/eventBus'
-let event = reactive<Event>({topic: 'NA'})
-Bus.on('evToChild2', (e: Event) => {
-    event.topic = e.topic
-    event.data = e.data
-})
+const items=[
+    {id:1,name:'a',age:3},
+    {id:2,name:'b',age:32},
+    {id:3,name:'c',age:33},
+    {id:4,name:'d',age:13},
+]
 </script>
 
 <style scoped>
