@@ -458,3 +458,54 @@ const btn = () => {
 
 <style scoped></style>
 ```
+
+### watch
+
+```
+<template>
+    <input type="text" name="input" v-model="msg">
+</template>
+
+<script setup lang="ts">
+import {ref, watch} from 'vue'
+
+let msg = ref("abc");
+
+watch( ()=>msg.value,
+    (newValue, oldValue) => {
+        console.error(`msg: ${newValue} from ${oldValue}`);
+    },
+    {immediate: true}
+)
+
+</script>
+
+<style scoped>
+
+</style>
+```
+watch 的第一个参数可以是不同形式的“数据源”：它可以是一个 ref (包括计算属性)、一个响应式对象、一个 getter 函数、或多个数据源组成的数组
+
+定义getter, setter
+
+```
+// 提供一个 getter 函数
+watch(
+  () => obj.count,
+  (count) => {
+    console.log(`count is: ${count}`)
+  }
+)
+
+```
+
+ - watchEffect()
+   watch 和 watchEffect 都能响应式地执行有副作用的回调。它们之间的主要区别是追踪响应式依赖的方式：
+
+watch 只追踪明确侦听的数据源。它不会追踪任何在回调中访问到的东西。另外，仅在数据源确实改变时才会触发回调。watch 会避免在发生副作用时追踪依赖，因此，我们能更加精确地控制回调函数的触发时机。
+
+watchEffect，则会在副作用发生期间追踪依赖。它会在同步执行过程中，自动追踪所有能访问到的响应式属性。这更方便，而且代码往往更简洁，但有时其响应性依赖关系会不那么明确。
+
+ - unwatch
+
+https://cn.vuejs.org/guide/essentials/watchers.html#stopping-a-watcher
