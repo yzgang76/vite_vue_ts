@@ -945,7 +945,7 @@ import LoggerService from "../services/LoggerService";
 
 const loggerService: LoggerService | undefined = inject('LoggerService');
 const moduleName = 'App';
-[Vue Simulator.md](..%2F..%2F..%2FUsers%2Fyzgan%2FDesktop%2FVue%20Simulator.md)
+
 function log(msg: string) {
     loggerService?.log(moduleName, msg);
 }
