@@ -826,6 +826,7 @@ import Child2 from "./Child2.vue"
     <template #default="{data}"> {{ data.age }}</template>
 ```
 
+
 https://cn.vuejs.org/guide/components/slots.html#scoped-slots
 
 完整代码
@@ -905,6 +906,8 @@ let dynamicSlot = 'div3'
 <style scoped></style>
 
 ```
+此时是可以比较有和没有:key的情况下, 选中第一个元素，点击按钮的结果
+
 
 ### 依赖注入
 
@@ -1132,3 +1135,96 @@ const Child1 = defineAsyncComponent(()=> import ("./Child1.vue"))
 ```<Suspense>``` 是一个内置组件，用来在组件树中协调对异步依赖的处理。它让我们可以在组件树上层等待下层的多个嵌套异步依赖项解析完成，并可以在等待时渲染一个加载状态。
 
 https://cn.vuejs.org/guide/components/async.html#loading-and-error-states
+
+### Pinia 状态管理
+替代Vuex https://pinia.web3doc.top/
+
+- state
+- getters
+- actions
+
+
+安装 ```npm i pinia -S```
+在 mian.ts中引入
+```
+import { createApp } from 'vue'
+import './style.css'
+import App from './components/App.vue' //注入根组件
+import LoggerService from "./services/LoggerService"
+import {createPinia} from 'pinia'
+
+const app = createApp(App)
+app.use(createPinia())
+app.provide(/*注入名*/'LoggerService',/*值*/ new LoggerService());
+app.mount('#app');
+```
+新建目录 src/store
+创建一个userStore.ts
+
+```
+import {defineStore} from 'pinia'
+
+export const userStore = defineStore('userModel', {  //第一个参数要唯一
+    state: () => {
+        return {  //返回到数据对象
+            num: 0,
+            name: "abc"
+        }
+    },
+    getters: {  //计算属性
+        reversedName(): string {
+            return this.name.split('').reverse().join('')
+        }
+    },
+    actions: {  //方法
+        growupAction(val: number): void {
+            this.num += val
+        }
+    }
+})
+```
+
+在Child1.vue中使用store
+
+```
+<template>
+    <h1>Child1</h1>
+    <div> I am {{name}}. I am {{num}} years old</div>
+    <button @click="growup">涨一岁</button>
+    <div>name mirror: {{store.reversedName}}</div>
+    <button @click="growupAction">涨十岁</button>
+    <br>
+    <button @click="reset">reset</button>
+</template>
+
+<script setup lang="ts">
+
+import {userStore} from "../store/userStore";
+import {storeToRefs} from "pinia";
+
+const store = userStore()
+let {name, num} = storeToRefs(store) //解构并响应
+const growup=()=>{
+    num.value++;
+    //如果不使用storeToRefs,可以通过$patch方法
+    /*store.$patch(state=>{
+        state.name="zhangsan"
+        state.num ++
+    })*/
+}
+
+const growupAction=()=>{
+    store.growupAction(10) //调用 store actions
+}
+
+const reset=()=>{
+    store.$reset() //重置数据到初始化状态
+}
+
+
+</script>
+
+<style scoped>
+
+</style>
+```
