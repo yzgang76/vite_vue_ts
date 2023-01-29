@@ -391,4 +391,70 @@ https://cn.vuejs.org/guide/essentials/event-handling.html#event-modifiers
 https://cn.vuejs.org/guide/essentials/forms.html
 
 
-### 生命周期钩子
+### 生命周期钩子以及动态组件
+
+新建两个组件Child1 和Child2
+
+Child1.vue: 打印生命周期事件  
+
+```
+<template>
+<h1>Child1</h1>
+</template>
+
+<script setup lang="ts">
+import {onBeforeMount, onBeforeUnmount, onMounted, onUnmounted} from "vue";
+
+onBeforeMount(()=>{
+    console.error('c1:onBeforeMount')
+})
+onMounted(()=>{
+    console.error('c1:onMounted')
+})
+onBeforeUnmount(()=>{
+    console.error('c1:onBeforeUnmount')
+})
+onUnmounted(()=>{
+    console.error('c1:onUnmounted')
+})
+</script>
+
+<style scoped>
+
+</style>
+```
+Child2.vue类似， 只有打印信息不同
+
+
+App.vue: 动态组件
+
+```
+<script setup lang="ts">
+import Child1 from './Child1.vue'  //导入子组件， 不需要注册
+import Child2 from './Child2.vue'
+import {ref, reactive, markRaw} from 'vue'
+
+const coms = reactive([
+    {id: 1, com: markRaw(Child1)},
+    {id: 2, com: markRaw(Child2)}
+])
+
+const selected = ref(coms[0])  //not reactive here
+
+const btn = () => {
+    if (selected.value.id === 1) selected.value = coms[1]
+    else selected.value = coms[0]
+}
+
+</script>
+
+<template>
+    <button @click="btn()">切换子组件</button>
+<!--cache the component-->
+    <keep-alive>
+        <component :is="selected.com">AAA</component>
+    </keep-alive>
+</template>
+
+<style scoped></style>
+```

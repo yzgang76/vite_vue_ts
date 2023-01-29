@@ -8,7 +8,7 @@ const coms = reactive([
     {id: 2, com: markRaw(Child2)}
 ])
 
-const selected = ref(coms[0])
+const selected = ref(coms[0])  //not reactive here
 
 const btn = () => {
     if (selected.value.id === 1) selected.value = coms[1]
