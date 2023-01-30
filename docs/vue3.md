@@ -3,12 +3,10 @@
 ## 开发环境
 
 1. Webstorm 安装插件
-![img.png](assets/plugins.png)
-
+![plugins.png](assets%2Fplugins.png)
 
 2. 创建Vite Vue项目
-
-![img.png](assets/createProject.png)
+![createProject.png](assets%2FcreateProject.png)
 
 3. package.json
 
@@ -37,11 +35,12 @@
 
 - npm run tasks
 
-![img.png](assets/npmRunTasks.png)
+![npmRunTasks.png](assets%2FnpmRunTasks.png)
 
 4. 默认文件
 
-![img.png](assets/defaultFiles.png)
+![defaultFiles.png](assets%2FdefaultFiles.png)
+
 
 - index.html: 起始页面模版文件
 
@@ -72,7 +71,8 @@ createApp(App).mount('#app')  //app 与index.html中dom id 一致
 
 num run dev
 
-![img.png](assets/runDev.png)
+![runDev.png](assets%2FrunDev.png)
+
 
 在vite.config.ts中配置启动端口
 
@@ -90,7 +90,8 @@ export default defineConfig({
 **本文中绝大多数代码将使用使用 Vue3.0 组合式，script-setup语法糖，TypeScript**
 
 1. 清理文件
-   ![img.png](assets/removeFiles.png)
+
+![removeFiles.png](assets%2FremoveFiles.png)
 
 2. 移动APP.vue到 components目录下；修改main.ts中注入路径 ```import App from './components/App.vue'``` ;清空App.vue
 
@@ -120,7 +121,7 @@ let rawHtml="<p>测试数据</p>"
 
 结果如下：
 
-![img.png](assets/v-html.png)
+![v-html.png](assets%2Fv-html.png)
 
 ### 响应式数据
 
@@ -973,7 +974,8 @@ https://cn.vuejs.org/guide/components/provide-inject.html#working-with-reactivit
 
 通过ApiFox定义一个新的API并自动生成模拟服务和数据
 
-![img.png](assets/simulateAPI.png)
+![simulateAPI.png](assets%2FsimulateAPI.png)
+
 
 在vite.conf.ts中配置proxy
 
@@ -1303,8 +1305,7 @@ export const userStore = defineStore('userModel', {
 
 在浏览器中也可以获得持久化信息
 
-![img.png](assets/persist.png)
-
+![persist.png](assets%2Fpersist.png)
 
 ### vue-router 路由
 
