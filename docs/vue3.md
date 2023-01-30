@@ -1786,6 +1786,35 @@ export type UserInfo = {
     age: number
 }
 ```
+----------------------------------
+
+- 路由嵌套（子路由）
+
+上例中三个user相关的API都是以 /user开始的，可以使用子路由的方式重新定义
+
+```
+{
+    path:'/user',
+    children:[
+        {
+            path:'byQuery',  // /user/byQuery
+            name:'userByQuery',
+            component:() => import('../components/UserDetails.vue')
+        },
+        {
+            path:'byParams',  // /user/byParams
+            name:'userByParams',
+            component:() => import('../components/UserDetails2.vue')
+        },
+        {
+            path:':id',  // /user/:id
+            name:'userByPath',
+            component:() => import('../components/UserDetails2.vue')
+        }
+    ]
+}
+```
+子路由可以无限嵌套
 
 ### SSR
 TODO
