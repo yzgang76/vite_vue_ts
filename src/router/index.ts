@@ -3,6 +3,10 @@ import Child1 from "../components/Child1.vue";
 const routers: Array<RouteRecordRaw> = [
     {
         path: '/',
+        redirect:'/login'  //访问 '/' 会自动跳转到 '/login'
+    },
+    {
+        path: '/login',
         name: 'login',
         component: Child1
     },

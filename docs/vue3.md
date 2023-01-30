@@ -1308,6 +1308,8 @@ export const userStore = defineStore('userModel', {
 
 ### vue-router 路由
 
+https://router.vuejs.org/zh/
+
 1. 安装插件 ```npm i vue-router -S```
 
 2. 创建 /router/index.ts
@@ -1350,7 +1352,7 @@ dist/assets/Child1-c57ba987.js   0.16 kB │ gzip:  0.16 kB
 dist/assets/index-0d804368.js   77.06 kB │ gzip: 30.71 kB
 
 ```
- - 语法上也可以这样写。 这样到话， Child1就会打入到index.js中，在项目初始阶段就被装载。
+ - 可以这样写。 这样到话， Child1就会打入到index.js中，在项目初始阶段就被装载。
 ```
 import Child1 from "../components/Child1.vue";
 ...
@@ -1396,6 +1398,73 @@ Child2.vue
 </template>
 ```
 测试： 分别访问localhost:3000 和localhost:3000/home
+
+--------------------------------------------------------------------
+
+ - 页面跳转： 通过页面DOM或者代码来控制跳转
+
+更新index.ts
+
+```
+import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
+import Child1 from "../components/Child1.vue";
+const routers: Array<RouteRecordRaw> = [
+    {
+        path: '/',
+        redirect:'/login'  //访问 '/' 会自动跳转到 '/login'
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Child1
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: () =>import ('../components/Child2.vue')
+    }
+]
+const router = createRouter({
+    history: createWebHistory(), //路由模式
+    routes:routers
+})
+
+export default router
+```
+
+APP.vue
+
+```
+<script setup lang="ts">
+import {useRouter} from 'vue-router'
+
+const router = useRouter()
+
+const navTo=(to:any)=>{
+    router.push(to)  //跳转到path
+}
+</script>
+
+<template>
+    <h1>App 数据</h1>
+    <h2> 通过router-link跳转</h2>
+    <router-link to="/login">To Child1</router-link>
+    <router-link style="margin-left:10px" :to="{name: 'home'}">To Child2</router-link>
+    <hr>
+    <h2>通过代码跳转</h2>
+    <button @click="navTo('/login')">To Child1</button>
+    <button style="margin-left:10px" @click="navTo({name: 'home'})">To Child2</button>
+    <hr>
+    <router-view></router-view>
+</template>
+```
+上例中展现了两种跳转方式：
+- 通过router-link
+- 通过代码控制
+在传递跳转目标的时候分别使用了path和name两种方式。目前这两种方式的结果是一样的，但在传递参数时候会不同，推荐使用命名的方式。
+
+
+
 
 
 ### SSR
