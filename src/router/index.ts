@@ -14,6 +14,21 @@ const routers: Array<RouteRecordRaw> = [
         path: '/home',
         name: 'home',
         component: () =>import ('../components/Child2.vue')
+    },
+    {
+        path:'/user/byQuery',
+        name:'userByQuery',
+        component:() => import('../components/UserDetails.vue')
+    },
+    {
+        path:'/user/byParams',
+        name:'userByParams',
+        component:() => import('../components/UserDetails2.vue')
+    },
+    {
+        path:'/user/:id',
+        name:'userByPath',
+        component:() => import('../components/UserDetails2.vue')
     }
 ]
 const router = createRouter({

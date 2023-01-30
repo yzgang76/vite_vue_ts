@@ -1087,7 +1087,7 @@ onBeforeMount(() => {
 ### 异步组件
 在大型项目中，我们可能需要拆分应用为更小的块，并仅在需要时再从服务器加载相关组件。Vue 提供了 defineAsyncComponent 方法来实现此功能
 - 延迟加载，优化性能
-- 打包分包，优化初始化[Vue Simulator.md](..%2F..%2F..%2FUsers%2Fyzgan%2FDesktop%2FVue%20Simulator.md)装载速度
+- 打包分包，优化初始化装载速度
 
 重写Child1.vue
 
@@ -1320,7 +1320,7 @@ const routers: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'login',
-        component: () =>import ('../components/Child1.vue')
+        component: () =>import ('../components/Child1.vue') //懒加载
     },
     {
         path: '/home',
@@ -1461,13 +1461,334 @@ const navTo=(to:any)=>{
 上例中展现了两种跳转方式：
 - 通过router-link
 - 通过代码控制
-在传递跳转目标的时候分别使用了path和name两种方式。目前这两种方式的结果是一样的，但在传递参数时候会不同，推荐使用命名的方式。
+在传递跳转目标的时候分别使用了path和name两种方式。目前这两种方式的结果是一样的，推荐使用命名的方式，和API path解耦。
+--------------------------------------------------------------------
+- 路由传参
 
+常用的方式有几种： 通过query参数， 通过params参数。
+需要注意的是，从vue-router 4.1.4开始不再支持银式params参数，
+就是说: <font color="red">**params中的参数必须在API path中预定义**</font>
+    
 
+新建一个路由
+```
+{
+    path:'/user/byQuery',
+    name:'userByQuery',
+    component:() => import('../components/UserDetails.vue')
+}
+```
+通过router.push来跳转和传参
+```
+const showDetailsByQuery = (id: number) => {
+    router.push({
+        name: 'userByQuery',
+        query: {id: id}
+    })
+}
+```
 
+创建第二个路由。 <font color="red">注意： 从4.1.4起不再支持</font>
+```
+{
+    path:'/user/byParams',
+    name:'userByParams',
+    component:() => import('../components/UserDetails2.vue')
+}
+```
+通过router.push来跳转和传参. 
 
+```
+const showDetailsByParam = (id: number) => {
+    router.push({
+        name: 'userByParams',
+        params: {id: id}  
+    })
+}
+```
+
+创建第三个路由。
+
+```
+{
+    path:'/user/:id',  //在path中定义params中的变量
+    name:'userByPath',
+    component:() => import('../components/UserDetails2.vue')
+}
+```
+通过router.push来跳转和传参.
+
+```
+const showDetailsByPath = (id: number) => {
+    router.push({
+        name: 'userByPath',
+        params: {id: id}  
+    })
+}
+```
+
+从vue-router 4.1.4起，所有传递的参数都会显示在URL上，这样的好处是刷新页面的时候不会丢失数据。（隐式的params有这个问题）。
+但同样的我们可能不希望敏感数据显示的URL上，或者我们要传递的参数超过的URL的最大长度。遇到这类情况就要
+a. 重新设计API和Component,不传递全数据，而值传递查询条件，数据在跳转后由新组建自行获取
+b. 结合pinia
+
+完整代码：
+
+App.vue
+
+```
+<template>
+    <router-view></router-view>
+</template>
+
+```
+
+Child1.vue
+```
+<template>
+    <h1>Child1</h1>
+
+    <h1>App 数据</h1>
+    <h2>通过query传递</h2>
+    <ul>
+        <li v-for="d in data" :key="d.id">
+            <button @click="showDetailsByQuery(d.id)">{{ d.name }}</button>
+        </li>
+    </ul>
+    <hr>
+    <h2>通过隐式param传递</h2>
+    <ul>
+        <li v-for="d in data" :key="d.id">
+            <button @click="showDetailsByParam(d.id)">{{ d.name }}</button>
+        </li>
+    </ul>
+    <hr>
+    <h2>通过path param传递</h2>
+    <ul>
+        <li v-for="d in data" :key="d.id">
+            <button @click="showDetailsByPath(d.id)">{{ d.name }}</button>
+        </li>
+    </ul>
+</template>
+
+<script setup lang="ts">
+import {useRouter} from 'vue-router'
+import {data} from '../data/data.json'
+
+const router = useRouter()
+
+const showDetailsByQuery = (id: number) => {
+    router.push({
+        name: 'userByQuery',
+        query: {id: id}
+    })
+}
+
+const showDetailsByParam = (id: number) => {
+    router.push({
+        name: 'userByParams',
+        params: {id: id}  //从4.14起不再支持
+    })
+}
+
+const showDetailsByPath = (id: number) => {
+    router.push({
+        name: 'userByPath',
+        params: {id: id}
+    })
+}
+</script>
+
+```
+
+UserDetails.vue
+
+```
+<template>
+    <h2>UserDetails: from Query</h2>
+    <div>
+        id: {{ user?.id }}<br>
+        name: {{user?.name}}<br>
+        age: {{user?.age}}<br>
+    </div>
+
+    <br>
+    <button @click="back">Back</button>
+</template>
+
+<script setup lang="ts">
+import {useRoute,useRouter} from 'vue-router'
+import {data} from '../data/data.json'
+import {ref, watchEffect} from "vue";
+import {UserInfo} from "../types/UserType";
+
+const route = useRoute()  //route 只读对象，用来获取传入的数据
+const router =useRouter()  //router 只写对象，完成路由功能
+
+const user = ref<UserInfo|undefined>()
+watchEffect(()=>{  //router.query 不是响应式数据，需要watch来监控变化
+    user.value = data.find((user) => user.id === Number(route.query?.id))
+})
+
+const back =()=>{  //增加返回按钮，用代码功能实现浏览器相同功能
+    router.back()
+}
+</script>
+
+```
+
+UserDetails2.vue
+```
+<template>
+    <h2>UserDetails2: from params</h2>
+    <div>
+        id: {{ user?.id }}<br>
+        name: {{user?.name}}<br>
+        age: {{user?.age}}<br>
+    </div>
+
+    <br>
+    <button @click="back">Back</button>
+</template>
+
+<script setup lang="ts">
+import {useRoute, useRouter} from 'vue-router'
+import {data} from '../data/data.json'
+import {ref, watchEffect} from "vue"
+import {UserInfo} from "../types/UserType"
+
+const route = useRoute()
+const router =useRouter()
+
+const user = ref<UserInfo|undefined>()
+watchEffect(()=>{
+    user.value = data.find((user) => user.id === Number(route.params?.id))
+})
+
+const back =()=>{
+    router.back()
+}
+
+</script>
+
+<style scoped>
+
+</style>
+```
+UserDetails3.vue
+```
+<template>
+    <h2>UserDetails: from Query</h2>
+    <div>
+        id: {{ user?.id }}<br>
+        name: {{user?.name}}<br>
+        age: {{user?.age}}<br>
+    </div>
+
+    <br>
+    <button @click="back">Back</button>
+</template>
+
+<script setup lang="ts">
+import {useRoute,useRouter} from 'vue-router'
+import {data} from '../data/data.json'
+import {ref, watchEffect} from "vue";
+import {UserInfo} from "../types/UserType";
+
+const route = useRoute()
+const router =useRouter()
+
+const user = ref<UserInfo|undefined>()
+watchEffect(()=>{
+    user.value = data.find((user) => user.id === Number(route.params.id))
+})
+
+const back =()=>{
+    router.back()
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+src/router/index.ts
+```
+import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
+import Child1 from "../components/Child1.vue";
+const routers: Array<RouteRecordRaw> = [
+    {
+        path: '/',
+        redirect:'/login'  //访问 '/' 会自动跳转到 '/login'
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Child1
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: () =>import ('../components/Child2.vue')
+    },
+    {
+        path:'/user/byQuery',
+        name:'userByQuery',
+        component:() => import('../components/UserDetails.vue')
+    },
+    {
+        path:'/user/byParams',
+        name:'userByParams',
+        component:() => import('../components/UserDetails2.vue')
+    },
+    {
+        path:'/user/:id',
+        name:'userByPath',
+        component:() => import('../components/UserDetails2.vue')
+    }
+]
+const router = createRouter({
+    history: createWebHistory(), //路由模式
+    routes:routers
+})
+
+export default router
+```
+
+src/data/data.json
+```
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "Zhangsang",
+            "age": 32
+        },
+        {
+            "id": 2,
+            "name": "Lisi",
+            "age": 13
+        },
+        {
+            "id": 3,
+            "name": "Wangwu",
+            "age": 53
+        }
+    ]
+}
+```
+src/types/UserTypes.ts
+
+```
+export type UserInfo = {
+    id: number,
+    name: string,
+    age: number
+}
+```
 
 ### SSR
+TODO
 
 ## Setup API Server by NodeJS & Express in Type Script
 
