@@ -1306,3 +1306,180 @@ export const userStore = defineStore('userModel', {
 ![img.png](assets/persist.png)
 
 
+### vue-router 路由
+
+1. 安装插件 ```npm i vue-router -S```
+
+2. 创建 /router/index.ts
+
+```
+import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
+const routers: Array<RouteRecordRaw> = [
+    {
+        path: '/',
+        name: 'login',
+        component: () =>import ('../components/Child1.vue')
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: () =>import ('../components/Child2.vue')
+    }
+]
+const router = createRouter({
+    history: createWebHistory(), //路由模式
+    routes:routers
+})
+
+export default router
+```
+
+在定义API component的时候，推荐按这种写法。
+- 这里引用到的组件的组件在打包时会进行分包，从而提高程序启动性能
+
+```
+> vite_vue_ts@0.0.0 build
+> vue-tsc && vite build
+
+vite v4.0.4 building for production...
+✓ 29 modules transformed.
+dist/index.html                  0.50 kB                 
+dist/assets/index-c16bd851.css   1.04 kB │ gzip:  0.56 kB
+dist/assets/Child2-46b13e5e.js   0.16 kB │ gzip:  0.16 kB
+dist/assets/Child1-c57ba987.js   0.16 kB │ gzip:  0.16 kB
+dist/assets/index-0d804368.js   77.06 kB │ gzip: 30.71 kB
+
+```
+ - 语法上也可以这样写。 这样到话， Child1就会打入到index.js中，在项目初始阶段就被装载。
+```
+import Child1 from "../components/Child1.vue";
+...
+component: Child1
+```
+
+3. 修改main.ts引入插件
+```
+import { createApp } from 'vue'
+import './style.css'
+import App from './components/App.vue' //注入根组件
+import router from './router'
+
+createApp(App).use(router).mount('#app')
+```
+
+4. 在App.vue中加入容器
+```
+<script setup lang="ts">
+
+</script>
+
+<template>
+    <h1>App 数据</h1>
+    <router-view></router-view>
+</template>
+
+<style scoped></style>
+```
+
+Child1.vue
+
+```
+<template>
+    <h1>Child1</h1>
+</template>
+```
+
+Child2.vue
+```
+<template>
+    <h1>Child2</h1>
+</template>
+```
+测试： 分别访问localhost:3000 和localhost:3000/home
+
+
+### SSR
+
+## Setup API Server by NodeJS & Express in Type Script
+
+创建一个新的npm项目
+
+package.json
+```
+{
+  "name": "api_server",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "scripts": {
+    "start": "tsc && node .",
+    "build": "tsc",
+    "dev": "tsc -w  & nodemon .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "zhigang",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.16",
+    "@types/node": "^18.11.18",
+    "nodemon": "^2.0.20",
+    "typescript": "^4.9.4"
+  },
+  "description": ""
+}
+
+```
+
+在根目录下新建tsconfig.json
+
+```
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2022",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "outDir": "build",
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": "."
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "build"
+    ]
+}
+```
+
+src/index.ts
+
+```
+import * as express from 'express' //不能写 import express from 'express'
+
+const app= express()
+
+app.get('/', (req,res)=>{
+    res.send({msg:'test'})
+})
+
+//more API
+
+const port=3001
+
+app.listen(port, ()=>{
+    console.log(`API Server Started on port ${port}`)
+})
+```
+
+- 运行方法
+
+npm run build
+npm run start
+
+如果运行 npm run dev会自动监控源码变化并自动build，但是还要重启npm run start才能生效 (可能需进一步配置)
