@@ -2,10 +2,11 @@ import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 import Child1 from "../components/Child1.vue";
 import VideoPlayer from "../components/VideoPlayer.vue";
 import VidoeRTC from "../components/VidoeRTC.vue";
+import DoubleVideo from "../components/DoubleVideo.vue";
 const routers: Array<RouteRecordRaw> = [
     {
         path: '/',
-        redirect:'/rtc'  //访问 '/' 会自动跳转到 '/login'
+        redirect:'/dvideo'  //访问 '/' 会自动跳转到 '/login'
     },
     {
         path: '/login',
@@ -16,6 +17,11 @@ const routers: Array<RouteRecordRaw> = [
         path: '/video',
         name: 'video',
         component: VideoPlayer
+    },
+    {
+        path: '/dvideo',
+        name: 'doublevideo',
+        component: DoubleVideo
     },
     {
         path: '/rtc',
